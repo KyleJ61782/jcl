@@ -249,7 +249,6 @@ var
           begin
             Inc(cp);
             cp := ReadStringDoubleQuotedMaybe(cp, Prefix);
-            Prefix := ExpandUNCFilename(Prefix);
           end;
 
         'h', 'H', '?':
@@ -308,8 +307,9 @@ var
             cp := ReadStringDoubleQuotedMaybe(cp, Prefix);
             Val(Prefix, StripLength, N);
             if N > 1 then
-              Prefix := Copy(Prefix, N + 1, Length(Prefix));
-            Prefix := ExpandUNCFilename(Prefix);
+              Prefix := Copy(Prefix, N + 1, Length(Prefix))
+            else
+              Prefix := '';
           end;
 
         'w', 'W':
