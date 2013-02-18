@@ -44,6 +44,9 @@
 program jpp;
 
 uses
+{$IFDEF MSWINDOWS}
+  Windows,
+{$ENDIF}
   SysUtils,
   JclPreProcessorParser,
   JppMain in 'JppMain.pas';
@@ -51,21 +54,36 @@ uses
 var
   State: TPppState;
   CommandLine: string;
+  {$IFDEF MSWINDOWS}
+  ch: PChar;
+  {$ELSE}
   i: Integer;
+  {$ENDIF}
 begin
   try
     State := TPppState.Create;
     try
-      i := 1;
       if ParamCount = 0 then
         Syntax
       else
       begin
+        {$IFDEF MSWINDOWS}
+        ch := GetCommandLine;
+        while (ch^ > #0) and (ch^ <= #32) do Inc(ch);
+        if ch^ = '"' then
+          repeat Inc(ch) until (ch^ = '"') or (ch^ = #0)
+        else
+          while ch^ > #32 do Inc(ch);
+        Inc(ch);
+        CommandLine := string(ch);
+        {$ELSE}
+        i := 1;
         while i <= ParamCount do
         begin
           CommandLine := CommandLine + ' ' + ParamStr(i);
           Inc(i);
         end;
+        {$ENDIF}
         Params(State, PChar(CommandLine));
       end;
     finally

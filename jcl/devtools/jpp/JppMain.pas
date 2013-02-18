@@ -196,12 +196,14 @@ var
     Result := cp;
     if Result^ = '"' then
     begin
-      while (Result^ <> #0) and (Result^ <> '"') do
+      repeat
         Inc(Result);
+      until (Result^ = #0) or (Result^ = '"');
       if Result^ = #0 then
         raise EJclError.Create('Unterminated string');
-      Inc(Result); // skip over final "
+      Inc(cp);
       SetString(AStr, cp, Result - cp);
+      Inc(Result); // skip over final "
     end
     else
     begin
@@ -335,7 +337,7 @@ var
 
       Files := TStringList.Create;
       try
-        AdvBuildFileList( ExpandUNCFileName(tmp), faAnyFile, Files, amAny);
+        AdvBuildFileList( ExpandUNCFileName(tmp), faAnyFile, Files, amAny, [flFullNames]);
 
         if Files.Count > 0 then
           for I := 0 to Files.Count - 1 do
@@ -349,11 +351,11 @@ var
 
               Substitute(NewName, SubstChar, ReplaceStrings);
 
-              NewName := ExpandUNCFileName(Prefix + NewName);
+              NewName := Prefix + NewName;
 
-              if FileName = NewName then
-                ChangeFileExt(NewName, ProcessedExtension);
-              Process(State, FileName, NewName);
+              if FileName = ExtractFilePath(FileName) + NewName then
+                NewName := ChangeFileExt(NewName, ProcessedExtension);
+              Process(State, FileName, ExtractFilePath(FileName) + NewName);
             except
               on e: EJclError do
                 Writeln(Format('Error: %s %s', [e.Message, FileName]));
