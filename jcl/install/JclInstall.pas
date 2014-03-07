@@ -16,9 +16,9 @@
 { Copyright (C) of Petr Vones. All Rights Reserved.                                                }
 {                                                                                                  }
 { Contributor(s):                                                                                  }
-{   - Robert Rossmair - crossplatform & BCB support, refactoring                                   }
-{   - Florent Ouchet (outchy) - New installer core                                                 }
-{                             - Resource refactorings                                              }
+{   Robert Rossmair - crossplatform & BCB support, refactoring                                     }
+{   Florent Ouchet (outchy) - New installer core, resource refactorings                            }
+{   Jean-Fabien Connault (cycocrew)                                                                }
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
@@ -3261,7 +3261,7 @@ function TJclDistribution.CreateInstall(Target: TJclBorRADToolInstallation): Boo
         Result := Target.VersionNumber in [6];
       brBorlandDevStudio :
         Result := ((Target.VersionNumber in [1, 2]) and (bpDelphi32 in Target.Personalities))
-          or (Target.VersionNumber in [3, 4, 5, 6, 7, 8, 9, 10, 11]);
+          or (Target.VersionNumber in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
       else
         Result := False;
     end;
@@ -3716,8 +3716,9 @@ begin
   if Assigned(GUI) and not IsElevated then
     GUI.Dialog(LoadResString(@RsHTMLHelp2Credentials), dtInformation, [drOK]);
 
-  // RegHelper.exe manifest requires elevation on Vista
-  if IsAdministrator or IsWinVista or IsWinServer2008 or IsWin7 or IsWinServer2008R2 then
+  // RegHelper.exe manifest requires elevation on Windows Vista/7/8/8.1 and Windows Server 2008/2008R2/2012/2012R2
+  if IsAdministrator or IsWinVista or IsWinServer2008 or IsWin7 or IsWinServer2008R2 or
+    IsWin8 or IsWinServer2012 or IsWin81 or IsWinServer2012R2 then
     Verb := 'open'
   else
     Verb := 'runas';
